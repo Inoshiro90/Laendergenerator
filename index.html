@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="de" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Ländergenerator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="app-header-brand">
+      <div class="app-header-logo" aria-hidden="true">CR</div>
+      <div>
+        <span class="app-header-title">Ländergenerator</span>
+        <span class="app-header-sub">Fantasykarte Generator</span>
+      </div>
+    </div>
+    <button id="themeToggle" class="theme-toggle" type="button"
+            aria-label="Zu Dark Mode wechseln" style="margin-left:auto">
+      <svg class="icon-sun" width="16" height="16" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <circle cx="12" cy="12" r="5"/>
+        <line x1="12" y1="1"  x2="12" y2="3"/>
+        <line x1="12" y1="21" x2="12" y2="23"/>
+        <line x1="4.22" y1="4.22"   x2="5.64"  y2="5.64"/>
+        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+        <line x1="1"  y1="12" x2="3"  y2="12"/>
+        <line x1="21" y1="12" x2="23" y2="12"/>
+        <line x1="4.22"  y1="19.78" x2="5.64"  y2="18.36"/>
+        <line x1="18.36" y1="5.64"  x2="19.78" y2="4.22"/>
+      </svg>
+      <svg class="icon-moon" width="16" height="16" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+      </svg>
+    </button>
+  </header>
+
+  <div class="app-layout">
+    <aside class="panel" role="complementary" aria-label="Generierungsoptionen">
+
+      <!-- SEED -->
+      <div class="panel-card">
+        <span class="panel-card-label">Seed</span>
+        <div class="seed-row">
+          <input class="seed-input" type="number" id="seed"
+                 value="187" min="0" max="99999" aria-label="Seed-Wert">
+          <button class="btn btn-secondary btn-sm" id="btnRandom" type="button">⚄ Zufall</button>
+        </div>
+      </div>
+
+      <!-- LANDGRÖSSE & KÜSTE -->
+      <div class="panel-card">
+        <span class="panel-card-label">Landgröße &amp; Küste</span>
+        <div class="field-stack">
+          <div class="field-group">
+            <label class="field-label" for="size">
+              Landgröße <span class="field-value" id="vsize"></span>
+            </label>
+            <input class="range-input" type="range" id="size" min="1" max="5" step="1" value="3">
+            <div class="range-hint" aria-hidden="true"><span>Klein</span><span>Mittel</span><span>Groß</span></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="shape">
+              Küstenform <span class="field-value" id="vshape"></span>
+            </label>
+            <input class="range-input" type="range" id="shape" min="1" max="5" step="1" value="3">
+            <div class="range-hint" aria-hidden="true"><span>Rund</span><span>Buchtig</span><span>Fjordreich</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LANDGESTALT -->
+      <div class="panel-card">
+        <span class="panel-card-label">Landgestalt</span>
+        <div class="shape-grid" id="shapeGrid" role="group" aria-label="Landform auswählen">
+
+          <!-- Kompakt -->
+          <button class="shape-btn active" data-shape="compact" type="button" aria-pressed="true">
+            <svg viewBox="0 0 56 40" fill="currentColor" stroke="none" aria-hidden="true">
+              <path d="M10,8 L16,6 L22,5 L30,5 L37,6 L43,8 L47,12 L48,17 L47,23 L44,28 L40,32 L34,34 L27,35 L20,34 L14,31 L10,26 L8,20 L9,14 Z"/>
+            </svg>
+            Kompakt
+          </button>
+
+          <!-- Länglich -->
+          <button class="shape-btn" data-shape="elongated" type="button" aria-pressed="false">
+            <svg viewBox="0 0 56 40" fill="currentColor" stroke="none" aria-hidden="true">
+              <path d="M22,2 L26,2 L30,2 L33,4 L34,8 L34,13 L33,18 L34,23 L33,28 L32,33 L30,37 L27,38 L24,37 L22,33 L21,28 L22,23 L21,18 L21,13 L21,8 Z"/>
+            </svg>
+            Länglich
+          </button>
+
+          <!-- Fragmentiert -->
+          <button class="shape-btn" data-shape="fragmented" type="button" aria-pressed="false">
+            <svg viewBox="0 0 56 40" fill="currentColor" stroke="none" aria-hidden="true">
+              <ellipse cx="12" cy="14" rx="9" ry="7"/>
+              <ellipse cx="30" cy="8"  rx="7" ry="5"/>
+              <ellipse cx="44" cy="20" rx="8" ry="6"/>
+              <ellipse cx="22" cy="31" rx="6" ry="5"/>
+            </svg>
+            Fragmentiert
+          </button>
+
+          <!-- Hervorstehend -->
+          <button class="shape-btn" data-shape="prorupted" type="button" aria-pressed="false">
+            <svg viewBox="0 0 56 40" fill="currentColor" stroke="none" aria-hidden="true">
+              <path d="M12,4 L18,3 L25,4 L32,4 L38,6 L42,10 L42,15 L39,19 L34,21 L30,22 L28,26 L27,30 L26,35 L24,38 L22,38 L21,34 L22,29 L22,24 L19,22 L14,20 L10,16 L9,11 Z"/>
+            </svg>
+            Hervorstehend
+          </button>
+
+          <!-- Perforiert -->
+          <button class="shape-btn" data-shape="perforated" type="button" aria-pressed="false">
+            <svg viewBox="0 0 56 40" fill="currentColor" stroke="none" aria-hidden="true">
+              <!-- Outer body -->
+              <path d="M8,8 L18,5 L30,4 L42,6 L50,12 L51,20 L48,28 L41,34 L30,36 L18,35 L10,30 L6,22 L7,14 Z"/>
+              <!-- Inner hole (cut out with evenodd) -->
+              <circle cx="28" cy="20" r="7" fill="var(--bg-surface, white)"/>
+            </svg>
+            Perforiert
+          </button>
+
+          <!-- Komplex -->
+          <button class="shape-btn" data-shape="complex" type="button" aria-pressed="false">
+            <svg viewBox="0 0 56 40" fill="currentColor" stroke="none" aria-hidden="true">
+              <path d="M6,10 L14,8 L22,8 L28,10 L32,14 L32,20 L29,24 L22,26 L14,25 L8,22 L5,16 Z"/>
+              <ellipse cx="43" cy="13" rx="7" ry="5"/>
+              <ellipse cx="40" cy="30" rx="5" ry="4"/>
+            </svg>
+            Komplex
+          </button>
+
+        </div>
+      </div>
+
+      <!-- GRENZLINIEN -->
+      <div class="panel-card">
+        <span class="panel-card-label">Grenzlinien</span>
+        <div class="field-stack">
+          <div class="field-group">
+            <label class="field-label" for="noisy">
+              Grenzrauheit <span class="field-value" id="vnoisy"></span>
+            </label>
+            <input class="range-input" type="range" id="noisy" min="0" max="100" step="1" value="40">
+            <div class="range-hint" aria-hidden="true"><span>Glatt</span><span>Natürlich</span><span>Rau</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           SHAPE-SPECIFIC PANELS (shown/hidden by JS)
+           ═══════════════════════════════════════════════════════════ -->
+
+      <!-- ELONGATED PARAMS -->
+      <div class="panel-card shape-options" data-visible-for="elongated" style="display:none">
+        <span class="panel-card-label">Länglich — Parameter</span>
+        <div class="field-stack">
+          <div class="field-group">
+            <label class="field-label" for="stretch_angle">
+              Richtung <span class="field-value" id="vstretch_angle"></span>
+            </label>
+            <input class="range-input" type="range" id="stretch_angle" min="0" max="180" step="5" value="90">
+            <div class="range-hint" aria-hidden="true"><span>O–W</span><span>Diagonal</span><span>N–S</span></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="aspect_ratio">
+              Streckung <span class="field-value" id="vaspect_ratio"></span>
+            </label>
+            <input class="range-input" type="range" id="aspect_ratio" min="15" max="50" step="1" value="25">
+            <div class="range-hint" aria-hidden="true"><span>1.5:1</span><span>3.0:1</span><span>5.0:1</span></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="elong_taper">
+              Verjüngung <span class="field-value" id="velong_taper"></span>
+            </label>
+            <input class="range-input" type="range" id="elong_taper" min="0" max="50" step="1" value="0">
+            <div class="range-hint" aria-hidden="true"><span>Keine</span><span></span><span>Stark</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FRAGMENTED PARAMS -->
+      <div class="panel-card shape-options" data-visible-for="fragmented" style="display:none">
+        <span class="panel-card-label">Fragmentiert — Parameter</span>
+        <div class="field-stack">
+          <div class="field-group">
+            <label class="field-label" for="cluster_count">
+              Inseln <span class="field-value" id="vcluster_count"></span>
+            </label>
+            <input class="range-input" type="range" id="cluster_count" min="2" max="8" step="1" value="4">
+            <div class="range-hint" aria-hidden="true"><span>2</span><span>5</span><span>8</span></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="cluster_spread">
+              Verteilung <span class="field-value" id="vcluster_spread"></span>
+            </label>
+            <input class="range-input" type="range" id="cluster_spread" min="30" max="90" step="5" value="65">
+            <div class="range-hint" aria-hidden="true"><span>Eng</span><span></span><span>Weit</span></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="cluster_size_var">
+              Größenvarianz <span class="field-value" id="vcluster_size_var"></span>
+            </label>
+            <input class="range-input" type="range" id="cluster_size_var" min="0" max="100" step="5" value="40">
+            <div class="range-hint" aria-hidden="true"><span>Gleich</span><span></span><span>Variabel</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRORUPTED PARAMS -->
+      <div class="panel-card shape-options" data-visible-for="prorupted" style="display:none">
+        <span class="panel-card-label">Hervorstehend — Parameter</span>
+        <div class="field-stack">
+          <!-- Auto angle toggle -->
+          <div class="field-group">
+            <label class="field-label" style="cursor:pointer">
+              <span>Winkel seed-abhängig</span>
+              <input type="checkbox" id="prot_auto_angle" checked
+                     style="width:14px;height:14px;cursor:pointer;accent-color:var(--color-accent)">
+            </label>
+          </div>
+          <div class="field-group" id="prot_angle_row" style="display:none">
+            <label class="field-label" for="prot_angle">
+              Winkel <span class="field-value" id="vprot_angle"></span>
+            </label>
+            <input class="range-input" type="range" id="prot_angle" min="0" max="360" step="5" value="200">
+            <div class="range-hint" aria-hidden="true"><span>0°</span><span>180°</span><span>360°</span></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="prot_length">
+              Länge <span class="field-value" id="vprot_length"></span>
+            </label>
+            <input class="range-input" type="range" id="prot_length" min="30" max="100" step="5" value="65">
+            <div class="range-hint" aria-hidden="true"><span>Kurz</span><span></span><span>Lang</span></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="prot_width">
+              Breite <span class="field-value" id="vprot_width"></span>
+            </label>
+            <input class="range-input" type="range" id="prot_width" min="8" max="30" step="1" value="18">
+            <div class="range-hint" aria-hidden="true"><span>Schmal</span><span></span><span>Breit</span></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="prot_taper">
+              Verjüngung <span class="field-value" id="vprot_taper"></span>
+            </label>
+            <input class="range-input" type="range" id="prot_taper" min="0" max="100" step="5" value="60">
+            <div class="range-hint" aria-hidden="true"><span>Gleich</span><span></span><span>Spitz</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERFORATED PARAMS -->
+      <div class="panel-card shape-options" data-visible-for="perforated" style="display:none">
+        <span class="panel-card-label">Perforiert — Parameter</span>
+        <div class="field-stack">
+          <div class="field-group">
+            <label class="field-label" for="enclave_count">
+              Enklaven <span class="field-value" id="venclave_count"></span>
+            </label>
+            <input class="range-input" type="range" id="enclave_count" min="1" max="3" step="1" value="1">
+            <div class="range-hint" aria-hidden="true"><span>1</span><span>2</span><span>3</span></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="enclave_radius">
+              Enklave-Größe <span class="field-value" id="venclave_radius"></span>
+            </label>
+            <input class="range-input" type="range" id="enclave_radius" min="5" max="18" step="1" value="13">
+            <div class="range-hint" aria-hidden="true"><span>Klein</span><span></span><span>Groß</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPLEX PARAMS -->
+      <div class="panel-card shape-options" data-visible-for="complex" style="display:none">
+        <span class="panel-card-label">Komplex — Preset</span>
+        <div class="field-stack" style="margin-top:var(--space-2)">
+          <div class="field-group">
+            <label class="field-label" for="complex_preset">Vorlage</label>
+            <select class="seed-input" id="complex_preset" style="height:32px;padding:0 8px;cursor:pointer">
+              <option value="usa">USA (Kontinent + Inseln)</option>
+              <option value="russia">Russland (gestreckt + Insel)</option>
+              <option value="malaysia">Malaysia (Halbinsel + Insel)</option>
+              <option value="archipelago_land">Archipel + Hauptland</option>
+              <option value="random">Zufällig (Seed-abhängig)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="complex_count">
+              Komponenten <span class="field-value" id="vcomplex_count"></span>
+            </label>
+            <input class="range-input" type="range" id="complex_count" min="2" max="4" step="1" value="2">
+            <div class="range-hint" aria-hidden="true"><span>2</span><span>3</span><span>4</span></div>
+          </div>
+          <p style="font-family:var(--font-mono);font-size:9px;color:var(--text-muted);opacity:.8;margin-top:2px">
+            Preset-Vorlagen ignorieren den Komponenten-Zähler.<br>
+            „Zufällig" nutzt Seed + Zähler.
+          </p>
+        </div>
+      </div>
+
+      <!-- VERWALTUNGSGLIEDERUNG -->
+      <div class="panel-card">
+        <span class="panel-card-label">Verwaltungsgliederung</span>
+        <div class="field-stack">
+          <div class="field-group">
+            <label class="field-label" for="nr">
+              Regionen <span class="field-value" id="vnr"></span>
+            </label>
+            <input class="range-input" type="range" id="nr" min="0" max="30" step="1" value="7">
+            <div class="range-hint" aria-hidden="true"><span>Keine</span><span></span><span>30</span></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="nrvar">
+              Größenvarianz Reg. <span class="field-value" id="vnrvar"></span>
+            </label>
+            <input class="range-input" type="range" id="nrvar" min="0" max="100" step="1" value="30">
+            <div class="range-hint" aria-hidden="true"><span>Gleich</span><span></span><span>Variabel</span></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="nsr">
+              Unterregionen <span class="field-value" id="vnsr"></span>
+            </label>
+            <input class="range-input" type="range" id="nsr" min="0" max="15" step="1" value="3">
+            <div class="range-hint" aria-hidden="true"><span>Keine</span><span></span><span>15</span></div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="nsrvar">
+              Größenvarianz Unter. <span class="field-value" id="vnsrvar"></span>
+            </label>
+            <input class="range-input" type="range" id="nsrvar" min="0" max="100" step="1" value="30">
+            <div class="range-hint" aria-hidden="true"><span>Gleich</span><span></span><span>Variabel</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GENERATE -->
+      <button class="btn btn-blue btn-generate" id="btnGen" type="button">
+        <span class="btn-spinner" aria-hidden="true"></span>
+        <span class="btn-label">Karte generieren</span>
+      </button>
+
+      <!-- EXPORT -->
+      <div class="panel-card">
+        <span class="panel-card-label">Export</span>
+        <div class="field-stack">
+          <div class="field-group">
+            <label class="field-label" for="res">
+              Auflösung PNG <span class="field-value" id="vres"></span>
+            </label>
+            <input class="range-input" type="range" id="res" min="0" max="4" step="1" value="1">
+            <div class="range-hint" aria-hidden="true"><span>800 px</span><span>1600 px</span><span>4000 px</span></div>
+          </div>
+          <div class="export-row">
+            <button class="btn btn-secondary btn-sm" id="bPNG" type="button">↓ PNG</button>
+            <button class="btn btn-secondary btn-sm" id="bSVG" type="button">↓ SVG</button>
+          </div>
+        </div>
+      </div>
+
+    </aside>
+
+    <main class="map-wrap" role="main" aria-label="Kartenvorschau">
+      <canvas id="map" width="800" height="800" aria-label="Generierte Karte"></canvas>
+      <div id="st" class="status-badge" role="status" aria-live="polite">Bereit</div>
+    </main>
+
+  </div><!-- /.app-layout -->
+
+  <script src="https://cdn.jsdelivr.net/npm/delaunator@5.0.1/delaunator.min.js"></script>
+  <script type="module" src="js/main.js"></script>
+
+  <!-- Theme toggle -->
+  <script>
+  (function() {
+    const html   = document.documentElement;
+    const toggle = document.getElementById('themeToggle');
+    if (!toggle) return;
+    function applyTheme(t) {
+      html.setAttribute('data-theme', t);
+      toggle.setAttribute('aria-label',
+        t === 'dark' ? 'Zu Light Mode wechseln' : 'Zu Dark Mode wechseln');
+    }
+    const saved = localStorage.getItem('ds-warm-theme');
+    if (saved) applyTheme(saved);
+    else if (window.matchMedia('(prefers-color-scheme: dark)').matches) applyTheme('dark');
+    toggle.addEventListener('click', () => {
+      const next = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      localStorage.setItem('ds-warm-theme', next);
+    });
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (!localStorage.getItem('ds-warm-theme')) applyTheme(e.matches ? 'dark' : 'light');
+    });
+  })();
+  </script>
+
+</body>
+</html>
