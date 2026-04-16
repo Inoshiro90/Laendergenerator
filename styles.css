@@ -563,6 +563,7 @@ textarea.form-input { height: auto; min-height: 80px; padding: 10px 12px; resize
   padding-top: calc(var(--space-3) + 4px);
   position: relative;
   transition: border-color var(--dur-base) var(--ease);
+  margin: var(--space-2);
 }
 
 .panel-card-label {
