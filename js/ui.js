@@ -155,7 +155,7 @@ export function initUI({ onShapeChange }) {
 
   // Random seed button
   document.getElementById('btnRandom').addEventListener('click', () => {
-    document.getElementById('seed').value = (Math.random() * 99999) | 0;
+    document.getElementById('seed').value = (Math.random() * 2147483647) | 0;
   });
 
   // Prorupted: toggle angle slider visibility

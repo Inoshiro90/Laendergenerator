@@ -473,12 +473,12 @@ textarea.form-input { height: auto; min-height: 80px; padding: 10px 12px; resize
 .app-header-logo {
   width: 28px;
   height: 28px;
-  background: var(--color-black-solid);
+  /* background: var(--color-black-solid); */
   border-radius: var(--radius-micro);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-white);
+  color: var(--color-accent);
   font-family: var(--font-mono);
   font-size: 9px;
   font-weight: var(--fw-bold);
@@ -487,8 +487,8 @@ textarea.form-input { height: auto; min-height: 80px; padding: 10px 12px; resize
   transition: background var(--dur-base) var(--ease);
 }
 [data-theme="dark"] .app-header-logo {
-  background: var(--text-primary);
-  color: var(--bg-page);
+  /* background: var(--text-primary); */
+  color: var(--color-accent);
 }
 
 .app-header-title {
