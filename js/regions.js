@@ -33,7 +33,6 @@ export function assignRegions(mesh, water_r, numReg, numSub, regVariance, subVar
   const nbNoise = buildSimplex(seed ^ 0xdeadcafe);
   const rOut    = [];
 
-  // Enclave cells have water_r[r]=1 — they are excluded automatically here.
   const landR      = [];
   const landRInner = [];
   for (let r = 0; r < mesh.numSolidRegions; r++) {
@@ -111,7 +110,6 @@ export function assignRegions(mesh, water_r, numReg, numSub, regVariance, subVar
     }
   }
 
-  // ── Sub-regions ───────────────────────────────────────────────────────────
   const subregion_r = new Int32Array(mesh.numRegions).fill(-1);
 
   if (numSub > 0) {

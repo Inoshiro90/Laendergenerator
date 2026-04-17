@@ -1,4 +1,4 @@
-import { S, MESH_SPACING, COMPLEX_PRESETS }     from './config.js';
+import { S, MESH_SPACING }                      from './config.js';
 import { mkRng, mkRandInt, buildSimplex }         from './math.js';
 import { TriangleMesh }                           from './mesh.js';
 import { buildNoisyLines }                        from './noise-edges.js';
@@ -7,7 +7,7 @@ import { assignWater }                            from './terrain.js';
 import { assignRegions }                          from './regions.js';
 import { drawMap, makeSVG }                       from './renderer.js';
 import { initExport }                             from './export.js';
-import { initUI, getP, setStatus }                from './ui.js';
+import { initUI, getP, setStatus, getRenderOpts } from './ui.js';
 import {
   placeClusterCenters,
   computeClusterProperties,
@@ -15,24 +15,22 @@ import {
 } from './fragmented.js';
 import { buildComplexFalloff, getPresetComponents } from './complex-shape.js';
 
-// ── Module state ──────────────────────────────────────────────────────────────
 let svgOut       = null;
 let currentShape = 'compact';
 let isGenerating = false;
 
 const tick = () => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
 
-// ── Main generation pipeline ──────────────────────────────────────────────────
 async function _gen() {
-  const p = getP(currentShape);
+  const p  = getP(currentShape);
+  const ro = getRenderOpts();
 
-  // ── Pre-compute shape-specific falloff functions ───────────────────────────
+  // Pre-compute shape-specific falloff functions
   if (p.landShape === 'fragmented') {
     const centers = placeClusterCenters(
       p.seed,
-      p.cluster_count          ?? 4,
-      p.cluster_spread         ?? 0.65,
-      p.cluster_min_separation ?? 0.22,
+      p.cluster_count  ?? 4,
+      p.cluster_spread ?? 0.65,
     );
     const { sizes, orientations, elongations } = computeClusterProperties(centers, p.seed, p);
     p.fragmentedFalloffFn = buildFragmentedFalloff(centers, sizes, orientations, elongations);
@@ -56,10 +54,8 @@ async function _gen() {
   const mesh = new TriangleMesh(pts, del, numBoundary);
 
   setStatus('Terrain…'); await tick();
-  const noise               = buildSimplex(p.seed);
-  const { water_r, enclave_r } = assignWater(
-    mesh, noise, p.round, p.inflate, p.landShape, p,
-  );
+  const noise = buildSimplex(p.seed);
+  const { water_r, enclave_r } = assignWater(mesh, noise, p.round, p.inflate, p.landShape, p);
 
   let landCount = 0;
   for (let r = 0; r < mesh.numSolidRegions; r++) if (!water_r[r]) landCount++;
@@ -76,16 +72,15 @@ async function _gen() {
   setStatus('Zeichne…'); await tick();
   drawMap(
     document.getElementById('map').getContext('2d'),
-    S, p, mesh, water_r, region_r, subregion_r, lines, enclave_r,
+    S, p, mesh, water_r, region_r, subregion_r, lines, enclave_r, ro,
   );
 
   setStatus('SVG…'); await tick();
-  svgOut = makeSVG(S, p, mesh, water_r, region_r, subregion_r, lines, enclave_r);
+  svgOut = makeSVG(S, p, mesh, water_r, region_r, subregion_r, lines, enclave_r, ro);
 
   setStatus(`Seed ${p.seed} — Fertig`, true);
 }
 
-// ── Public generate() ─────────────────────────────────────────────────────────
 function generate() {
   if (isGenerating) return;
   isGenerating = true;
@@ -97,10 +92,7 @@ function generate() {
   label.textContent = 'Generiere…';
 
   _gen()
-    .catch(e => {
-      console.error(e);
-      setStatus('Fehler: ' + e.message);
-    })
+    .catch(e => { console.error(e); setStatus('Fehler: ' + e.message); })
     .finally(() => {
       btn.classList.remove('busy');
       btn.disabled = false;
@@ -109,8 +101,13 @@ function generate() {
     });
 }
 
-// ── Bootstrap ─────────────────────────────────────────────────────────────────
-initUI({ onShapeChange: shape => { currentShape = shape; } });
+initUI({
+  onShapeChange: shape => { currentShape = shape; },
+  // Re-render with current data when render options change
+  onRenderChange: () => {
+    if (svgOut) generate();
+  },
+});
 initExport(() => svgOut, () => getP(currentShape));
 document.getElementById('btnGen').addEventListener('click', generate);
 generate();
